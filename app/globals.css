@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+@media print {
+  @page { size: A4 landscape; margin: 0; }
+  body { margin: 0; padding: 0; background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .no-print { display: none !important; }
+  .print-only { display: flex !important; }
+  .print-container {
+    width: 297mm; height: 210mm; overflow: hidden; page-break-after: always; background: white;
+  }
+}
+
+.preview-container {
+  width: 297mm; min-height: 210mm; background: white;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); margin: 0 auto 2rem auto;
+}
