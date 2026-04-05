@@ -99,6 +99,13 @@ export default function App() {
   const [searchTermDbPage, setSearchTermDbPage] = useState('');
   const [editingDbId, setEditingDbId] = useState<string | null>(null);
   const [editDbForm, setEditDbForm] = useState({ title: '', lyrics: '' });
+  const [dbCurrentPage, setDbCurrentPage] = useState(1);
+  const dbItemsPerPage = 10;
+
+  // Reset pagination saat search berubah
+  useEffect(() => {
+    setDbCurrentPage(1);
+  }, [searchTermDbPage]);
 
 
   useEffect(() => {
@@ -598,12 +605,12 @@ export default function App() {
     <div className="min-h-screen bg-gray-100 font-sans">
       <style>{printStyles}</style>
 
-      <nav className="bg-blue-900 text-white p-4 shadow-md flex justify-between items-center no-print sticky top-0 z-40">
+      <nav className="bg-blue-900 text-white p-4 shadow-md flex flex-col md:flex-row justify-between items-center gap-4 md:gap-0 no-print sticky top-0 z-40">
         <div className="flex items-center gap-2">
           <BookOpen size={24} />
           <h1 className="text-xl font-bold">Warta Jemaat Pro</h1>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap justify-center md:justify-end gap-2">
           <button onClick={() => setViewMode('form')} className={`flex items-center gap-2 px-3 py-2 rounded-md transition text-sm ${viewMode === 'form' ? 'bg-blue-700 font-bold' : 'hover:bg-blue-800'}`}>
             <Edit3 size={16} /> Editor Warta
           </button>
@@ -613,7 +620,7 @@ export default function App() {
           <button onClick={() => setViewMode('preview')} className={`flex items-center gap-2 px-3 py-2 rounded-md transition text-sm ${viewMode === 'preview' ? 'bg-blue-700 font-bold' : 'hover:bg-blue-800'}`}>
             <Eye size={16} /> Preview Cetak
           </button>
-          <button onClick={handlePrint} className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 rounded-md transition font-medium text-sm ml-4 shadow-sm">
+          <button onClick={handlePrint} className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 rounded-md transition font-medium text-sm md:ml-4 shadow-sm w-full md:w-auto justify-center">
             <Printer size={16} /> Cetak / PDF
           </button>
         </div>
@@ -623,12 +630,12 @@ export default function App() {
 
         {viewMode === 'form' && (
           <div className="max-w-7xl mx-auto bg-white rounded-xl shadow-sm border border-gray-200 overflow-visible no-print">
-            <div className="p-6 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+            <div className="p-6 border-b border-gray-200 bg-gray-50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div>
                 <h2 className="text-2xl font-bold text-gray-800">Editor Warta & Liturgi</h2>
                 <p className="text-gray-500 text-sm mt-1">Isi data identitas dan masukkan urutan lagu. Sistem auto-format akan menyesuaikan pemecahan halamannya.</p>
               </div>
-              <button onClick={handleSaveDraft} disabled={isSaving} className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 flex items-center gap-2">
+              <button onClick={handleSaveDraft} disabled={isSaving} className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 flex items-center gap-2 whitespace-nowrap">
                 <Save size={16} /> {isSaving ? 'Menyimpan...' : 'Simpan Draft'}
               </button>
             </div>
@@ -646,12 +653,12 @@ export default function App() {
                       <label className="block text-sm font-medium text-gray-700 mb-1">Tema Pelayanan</label>
                       <input type="text" name="theme" value={data.theme} onChange={handleInputChange} className="w-full p-2 border rounded-md text-sm outline-blue-500" placeholder="Contoh: Kasih yang Memulihkan" />
                     </div>
-                    <div className="flex gap-4">
-                      <div className="w-1/3">
+                    <div className="flex flex-col sm:flex-row gap-4">
+                      <div className="w-full sm:w-1/3">
                         <label className="block text-sm font-medium text-gray-700 mb-1">Referensi</label>
                         <input type="text" name="bibleRef" value={data.bibleRef} onChange={handleInputChange} className="w-full p-2 border rounded-md text-sm outline-blue-500" placeholder="Filipi 4:19" />
                       </div>
-                      <div className="w-2/3">
+                      <div className="w-full sm:w-2/3">
                         <label className="block text-sm font-medium text-gray-700 mb-1">Isi Ayat</label>
                         <textarea name="bibleContent" value={data.bibleContent} onChange={handleInputChange} rows={2} className="w-full p-2 border rounded-md text-sm outline-blue-500" />
                       </div>
@@ -808,13 +815,13 @@ export default function App() {
 
         {viewMode === 'database' && (
           <div className="max-w-5xl mx-auto bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden no-print">
-            <div className="p-6 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+            <div className="p-6 border-b border-gray-200 bg-gray-50 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
               <div>
                 <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2"><Database size={24} /> Database Lagu Jemaat</h2>
                 <p className="text-gray-500 text-sm mt-1">Kelola perbendaharaan lagu. Gunakan format CSV, TXT, atau XLSX untuk import massal.</p>
               </div>
 
-              <div className="relative">
+              <div className="relative w-full md:w-auto">
                 <input
                   type="file"
                   accept=".csv,.txt,.xlsx"
@@ -822,15 +829,15 @@ export default function App() {
                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                   title="Import File"
                 />
-                <button className="px-4 py-2 bg-green-600 text-white rounded-md text-sm font-medium hover:bg-green-700 flex items-center gap-2 pointer-events-none">
+                <button className="w-full md:w-auto px-4 py-2 bg-green-600 text-white rounded-md text-sm font-medium hover:bg-green-700 flex items-center justify-center gap-2 pointer-events-none">
                   <Upload size={16} /> Bulk Import Data
                 </button>
               </div>
             </div>
 
             <div className="p-6">
-              <div className="flex justify-between mb-4">
-                <div className="relative w-1/2 md:w-1/3">
+              <div className="flex flex-col sm:flex-row justify-between mb-4 gap-3 sm:gap-0">
+                <div className="relative w-full sm:w-1/2 md:w-1/3">
                   <Search size={16} className="absolute left-3 top-2.5 text-gray-400" />
                   <input
                     type="text"
@@ -840,13 +847,13 @@ export default function App() {
                     className="w-full pl-9 p-2 border rounded-md text-sm outline-blue-500"
                   />
                 </div>
-                <div className="text-sm text-gray-500 flex items-center">
+                <div className="text-sm text-gray-500 flex items-center justify-end">
                   Total: <span className="font-bold text-gray-800 ml-1">{songDb.length} Lagu</span>
                 </div>
               </div>
 
-              <div className="overflow-hidden border rounded-lg">
-                <table className="w-full text-left text-sm">
+              <div className="overflow-x-auto border rounded-lg">
+                <table className="w-full text-left text-sm min-w-[700px]">
                   <thead className="bg-gray-100 text-gray-700">
                     <tr>
                       <th className="p-3 w-1/4">Judul Lagu</th>
@@ -855,10 +862,16 @@ export default function App() {
                     </tr>
                   </thead>
                   <tbody className="divide-y">
-                    {songDb.filter(s =>
-                      s.title.toLowerCase().includes(searchTermDbPage.toLowerCase()) ||
-                      s.lyrics.toLowerCase().includes(searchTermDbPage.toLowerCase())
-                    ).map((song) => (
+                    {(() => {
+                      const filteredDb = songDb.filter(s =>
+                        s.title.toLowerCase().includes(searchTermDbPage.toLowerCase()) ||
+                        s.lyrics.toLowerCase().includes(searchTermDbPage.toLowerCase())
+                      );
+                      const indexOfLastItem = dbCurrentPage * dbItemsPerPage;
+                      const indexOfFirstItem = indexOfLastItem - dbItemsPerPage;
+                      const currentItems = filteredDb.slice(indexOfFirstItem, indexOfLastItem);
+                      
+                      return currentItems.map((song) => (
                       // Beralih ke form edit jika sedang di mode edit
                       editingDbId === song.id ? (
                         <tr key={song.id} className="bg-blue-50">
@@ -893,12 +906,72 @@ export default function App() {
                           </td>
                         </tr>
                       )
-                    ))}
-                    {songDb.length === 0 && (
-                      <tr><td colSpan={3} className="p-6 text-center text-gray-500">Database kosong. Silakan import file.</td></tr>
+                    ));
+                    })()}
+                    {songDb.filter(s =>
+                        s.title.toLowerCase().includes(searchTermDbPage.toLowerCase()) ||
+                        s.lyrics.toLowerCase().includes(searchTermDbPage.toLowerCase())
+                      ).length === 0 && (
+                      <tr><td colSpan={3} className="p-6 text-center text-gray-500">Database kosong atau lagu tidak ditemukan. Silakan import file.</td></tr>
                     )}
                   </tbody>
                 </table>
+                
+                {/* PAGINATION UI */}
+                {(() => {
+                  const filteredDb = songDb.filter(s =>
+                    s.title.toLowerCase().includes(searchTermDbPage.toLowerCase()) ||
+                    s.lyrics.toLowerCase().includes(searchTermDbPage.toLowerCase())
+                  );
+                  const totalPages = Math.ceil(filteredDb.length / dbItemsPerPage);
+
+                  if (totalPages > 1) {
+                    return (
+                      <div className="flex justify-between items-center p-4 bg-white border-t">
+                        <div className="text-xs text-gray-500">
+                          Menampilkan {((dbCurrentPage - 1) * dbItemsPerPage) + 1} - {Math.min(dbCurrentPage * dbItemsPerPage, filteredDb.length)} dari {filteredDb.length} lagu
+                        </div>
+                        <div className="flex gap-1">
+                          <button
+                            onClick={() => setDbCurrentPage(p => Math.max(1, p - 1))}
+                            disabled={dbCurrentPage === 1}
+                            className={`px-3 py-1 text-sm border rounded ${dbCurrentPage === 1 ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'hover:bg-blue-50 text-blue-600'}`}
+                          >
+                            Sebelumnya
+                          </button>
+                          
+                          {Array.from({ length: totalPages }).map((_, idx) => {
+                            const page = idx + 1;
+                            // Simplistic pagination view
+                            if (page === 1 || page === totalPages || (page >= dbCurrentPage - 1 && page <= dbCurrentPage + 1)) {
+                                return (
+                                  <button
+                                    key={page}
+                                    onClick={() => setDbCurrentPage(page)}
+                                    className={`px-3 py-1 text-sm border rounded ${dbCurrentPage === page ? 'bg-blue-600 text-white font-bold' : 'hover:bg-blue-50 text-gray-700'}`}
+                                  >
+                                    {page}
+                                  </button>
+                                );
+                            } else if (page === dbCurrentPage - 2 || page === dbCurrentPage + 2) {
+                                return <span key={page} className="px-1 py-1 text-gray-400">...</span>;
+                            }
+                            return null;
+                          })}
+
+                          <button
+                            onClick={() => setDbCurrentPage(p => Math.min(totalPages, p + 1))}
+                            disabled={dbCurrentPage === totalPages}
+                            className={`px-3 py-1 text-sm border rounded ${dbCurrentPage === totalPages ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'hover:bg-blue-50 text-blue-600'}`}
+                          >
+                            Selanjutnya
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
               </div>
             </div>
           </div>
