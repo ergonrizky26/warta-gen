@@ -99,6 +99,13 @@ export default function App() {
   const [searchTermDbPage, setSearchTermDbPage] = useState('');
   const [editingDbId, setEditingDbId] = useState<string | null>(null);
   const [editDbForm, setEditDbForm] = useState({ title: '', lyrics: '' });
+  const [dbCurrentPage, setDbCurrentPage] = useState(1);
+  const dbItemsPerPage = 10;
+
+  // Reset pagination saat search berubah
+  useEffect(() => {
+    setDbCurrentPage(1);
+  }, [searchTermDbPage]);
 
 
   useEffect(() => {
@@ -855,10 +862,16 @@ export default function App() {
                     </tr>
                   </thead>
                   <tbody className="divide-y">
-                    {songDb.filter(s =>
-                      s.title.toLowerCase().includes(searchTermDbPage.toLowerCase()) ||
-                      s.lyrics.toLowerCase().includes(searchTermDbPage.toLowerCase())
-                    ).map((song) => (
+                    {(() => {
+                      const filteredDb = songDb.filter(s =>
+                        s.title.toLowerCase().includes(searchTermDbPage.toLowerCase()) ||
+                        s.lyrics.toLowerCase().includes(searchTermDbPage.toLowerCase())
+                      );
+                      const indexOfLastItem = dbCurrentPage * dbItemsPerPage;
+                      const indexOfFirstItem = indexOfLastItem - dbItemsPerPage;
+                      const currentItems = filteredDb.slice(indexOfFirstItem, indexOfLastItem);
+                      
+                      return currentItems.map((song) => (
                       // Beralih ke form edit jika sedang di mode edit
                       editingDbId === song.id ? (
                         <tr key={song.id} className="bg-blue-50">
@@ -893,12 +906,72 @@ export default function App() {
                           </td>
                         </tr>
                       )
-                    ))}
-                    {songDb.length === 0 && (
-                      <tr><td colSpan={3} className="p-6 text-center text-gray-500">Database kosong. Silakan import file.</td></tr>
+                    ));
+                    })()}
+                    {songDb.filter(s =>
+                        s.title.toLowerCase().includes(searchTermDbPage.toLowerCase()) ||
+                        s.lyrics.toLowerCase().includes(searchTermDbPage.toLowerCase())
+                      ).length === 0 && (
+                      <tr><td colSpan={3} className="p-6 text-center text-gray-500">Database kosong atau lagu tidak ditemukan. Silakan import file.</td></tr>
                     )}
                   </tbody>
                 </table>
+                
+                {/* PAGINATION UI */}
+                {(() => {
+                  const filteredDb = songDb.filter(s =>
+                    s.title.toLowerCase().includes(searchTermDbPage.toLowerCase()) ||
+                    s.lyrics.toLowerCase().includes(searchTermDbPage.toLowerCase())
+                  );
+                  const totalPages = Math.ceil(filteredDb.length / dbItemsPerPage);
+
+                  if (totalPages > 1) {
+                    return (
+                      <div className="flex justify-between items-center p-4 bg-white border-t">
+                        <div className="text-xs text-gray-500">
+                          Menampilkan {((dbCurrentPage - 1) * dbItemsPerPage) + 1} - {Math.min(dbCurrentPage * dbItemsPerPage, filteredDb.length)} dari {filteredDb.length} lagu
+                        </div>
+                        <div className="flex gap-1">
+                          <button
+                            onClick={() => setDbCurrentPage(p => Math.max(1, p - 1))}
+                            disabled={dbCurrentPage === 1}
+                            className={`px-3 py-1 text-sm border rounded ${dbCurrentPage === 1 ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'hover:bg-blue-50 text-blue-600'}`}
+                          >
+                            Sebelumnya
+                          </button>
+                          
+                          {Array.from({ length: totalPages }).map((_, idx) => {
+                            const page = idx + 1;
+                            // Simplistic pagination view
+                            if (page === 1 || page === totalPages || (page >= dbCurrentPage - 1 && page <= dbCurrentPage + 1)) {
+                                return (
+                                  <button
+                                    key={page}
+                                    onClick={() => setDbCurrentPage(page)}
+                                    className={`px-3 py-1 text-sm border rounded ${dbCurrentPage === page ? 'bg-blue-600 text-white font-bold' : 'hover:bg-blue-50 text-gray-700'}`}
+                                  >
+                                    {page}
+                                  </button>
+                                );
+                            } else if (page === dbCurrentPage - 2 || page === dbCurrentPage + 2) {
+                                return <span key={page} className="px-1 py-1 text-gray-400">...</span>;
+                            }
+                            return null;
+                          })}
+
+                          <button
+                            onClick={() => setDbCurrentPage(p => Math.min(totalPages, p + 1))}
+                            disabled={dbCurrentPage === totalPages}
+                            className={`px-3 py-1 text-sm border rounded ${dbCurrentPage === totalPages ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'hover:bg-blue-50 text-blue-600'}`}
+                          >
+                            Selanjutnya
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
               </div>
             </div>
           </div>
