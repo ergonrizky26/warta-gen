@@ -141,7 +141,7 @@ export default function App() {
             bibleContent: bulletin.bible_content,
             imgFooter: bulletin.footer_image_url || "",
             headerBannerLeft: bulletin.header_image_url || "",
-            headerBannerRight: "",
+            headerBannerRight: bulletin.header_banner_url || "",
             imgHeader: bulletin.header_image_url_2 || "",
             greetingText: greeting,
             announcements: aData ? aData.map(a => ({ id: a.id, text: a.content })) : [],
@@ -169,6 +169,7 @@ export default function App() {
         bible_content: data.bibleContent,
         footer_image_url: data.imgFooter,
         header_image_url: data.headerBannerLeft,
+        header_banner_url: data.headerBannerRight,
         header_image_url_2: data.imgHeader
       };
 
@@ -870,53 +871,53 @@ export default function App() {
                       const indexOfLastItem = dbCurrentPage * dbItemsPerPage;
                       const indexOfFirstItem = indexOfLastItem - dbItemsPerPage;
                       const currentItems = filteredDb.slice(indexOfFirstItem, indexOfLastItem);
-                      
+
                       return currentItems.map((song) => (
-                      // Beralih ke form edit jika sedang di mode edit
-                      editingDbId === song.id ? (
-                        <tr key={song.id} className="bg-blue-50">
-                          <td className="p-3 align-top">
-                            <input
-                              type="text"
-                              value={editDbForm.title}
-                              onChange={(e) => setEditDbForm({ ...editDbForm, title: e.target.value })}
-                              className="w-full p-2 border rounded text-sm font-bold outline-blue-500 bg-white"
-                            />
-                          </td>
-                          <td className="p-3 align-top">
-                            <textarea
-                              value={editDbForm.lyrics}
-                              onChange={(e) => setEditDbForm({ ...editDbForm, lyrics: e.target.value })}
-                              className="w-full p-2 border rounded text-sm outline-blue-500 bg-white"
-                              rows={4}
-                            />
-                          </td>
-                          <td className="p-3 align-top flex justify-center gap-2">
-                            <button onClick={saveEditDbSong} title="Simpan" className="text-green-600 hover:text-white hover:bg-green-600 p-2 bg-green-100 rounded transition"><Save size={16} /></button>
-                            <button onClick={cancelEditDbSong} title="Batal" className="text-gray-500 hover:text-white hover:bg-gray-500 p-2 bg-gray-200 rounded transition"><X size={16} /></button>
-                          </td>
-                        </tr>
-                      ) : (
-                        <tr key={song.id} className="hover:bg-gray-50">
-                          <td className="p-3 font-bold text-gray-800 align-top">{song.title}</td>
-                          <td className="p-3 text-gray-600 whitespace-pre-wrap leading-snug text-xs align-top">{song.lyrics}</td>
-                          <td className="p-3 align-top flex justify-center gap-2">
-                            <button onClick={() => startEditDbSong(song)} className="text-blue-500 hover:text-blue-700 p-1.5 bg-blue-50 hover:bg-blue-100 rounded transition"><Edit3 size={16} /></button>
-                            <button onClick={() => removeDbSong(song.id)} className="text-red-500 hover:text-red-700 p-1.5 bg-red-50 hover:bg-red-100 rounded transition"><Trash2 size={16} /></button>
-                          </td>
-                        </tr>
-                      )
-                    ));
+                        // Beralih ke form edit jika sedang di mode edit
+                        editingDbId === song.id ? (
+                          <tr key={song.id} className="bg-blue-50">
+                            <td className="p-3 align-top">
+                              <input
+                                type="text"
+                                value={editDbForm.title}
+                                onChange={(e) => setEditDbForm({ ...editDbForm, title: e.target.value })}
+                                className="w-full p-2 border rounded text-sm font-bold outline-blue-500 bg-white"
+                              />
+                            </td>
+                            <td className="p-3 align-top">
+                              <textarea
+                                value={editDbForm.lyrics}
+                                onChange={(e) => setEditDbForm({ ...editDbForm, lyrics: e.target.value })}
+                                className="w-full p-2 border rounded text-sm outline-blue-500 bg-white"
+                                rows={4}
+                              />
+                            </td>
+                            <td className="p-3 align-top flex justify-center gap-2">
+                              <button onClick={saveEditDbSong} title="Simpan" className="text-green-600 hover:text-white hover:bg-green-600 p-2 bg-green-100 rounded transition"><Save size={16} /></button>
+                              <button onClick={cancelEditDbSong} title="Batal" className="text-gray-500 hover:text-white hover:bg-gray-500 p-2 bg-gray-200 rounded transition"><X size={16} /></button>
+                            </td>
+                          </tr>
+                        ) : (
+                          <tr key={song.id} className="hover:bg-gray-50">
+                            <td className="p-3 font-bold text-gray-800 align-top">{song.title}</td>
+                            <td className="p-3 text-gray-600 whitespace-pre-wrap leading-snug text-xs align-top">{song.lyrics}</td>
+                            <td className="p-3 align-top flex justify-center gap-2">
+                              <button onClick={() => startEditDbSong(song)} className="text-blue-500 hover:text-blue-700 p-1.5 bg-blue-50 hover:bg-blue-100 rounded transition"><Edit3 size={16} /></button>
+                              <button onClick={() => removeDbSong(song.id)} className="text-red-500 hover:text-red-700 p-1.5 bg-red-50 hover:bg-red-100 rounded transition"><Trash2 size={16} /></button>
+                            </td>
+                          </tr>
+                        )
+                      ));
                     })()}
                     {songDb.filter(s =>
-                        s.title.toLowerCase().includes(searchTermDbPage.toLowerCase()) ||
-                        s.lyrics.toLowerCase().includes(searchTermDbPage.toLowerCase())
-                      ).length === 0 && (
-                      <tr><td colSpan={3} className="p-6 text-center text-gray-500">Database kosong atau lagu tidak ditemukan. Silakan import file.</td></tr>
-                    )}
+                      s.title.toLowerCase().includes(searchTermDbPage.toLowerCase()) ||
+                      s.lyrics.toLowerCase().includes(searchTermDbPage.toLowerCase())
+                    ).length === 0 && (
+                        <tr><td colSpan={3} className="p-6 text-center text-gray-500">Database kosong atau lagu tidak ditemukan. Silakan import file.</td></tr>
+                      )}
                   </tbody>
                 </table>
-                
+
                 {/* PAGINATION UI */}
                 {(() => {
                   const filteredDb = songDb.filter(s =>
@@ -939,22 +940,22 @@ export default function App() {
                           >
                             Sebelumnya
                           </button>
-                          
+
                           {Array.from({ length: totalPages }).map((_, idx) => {
                             const page = idx + 1;
                             // Simplistic pagination view
                             if (page === 1 || page === totalPages || (page >= dbCurrentPage - 1 && page <= dbCurrentPage + 1)) {
-                                return (
-                                  <button
-                                    key={page}
-                                    onClick={() => setDbCurrentPage(page)}
-                                    className={`px-3 py-1 text-sm border rounded ${dbCurrentPage === page ? 'bg-blue-600 text-white font-bold' : 'hover:bg-blue-50 text-gray-700'}`}
-                                  >
-                                    {page}
-                                  </button>
-                                );
+                              return (
+                                <button
+                                  key={page}
+                                  onClick={() => setDbCurrentPage(page)}
+                                  className={`px-3 py-1 text-sm border rounded ${dbCurrentPage === page ? 'bg-blue-600 text-white font-bold' : 'hover:bg-blue-50 text-gray-700'}`}
+                                >
+                                  {page}
+                                </button>
+                              );
                             } else if (page === dbCurrentPage - 2 || page === dbCurrentPage + 2) {
-                                return <span key={page} className="px-1 py-1 text-gray-400">...</span>;
+                              return <span key={page} className="px-1 py-1 text-gray-400">...</span>;
                             }
                             return null;
                           })}
