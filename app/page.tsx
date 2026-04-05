@@ -235,8 +235,9 @@ export default function App() {
     if (!file) return;
     const reader = new FileReader();
     reader.onload = (evt) => {
-      if (evt.target?.result) {
-        setData(prev => ({ ...prev, [field]: evt.target.result as string }));
+      const result = evt.target?.result;
+      if (result) {
+        setData(prev => ({ ...prev, [field]: result as string }));
       }
     };
     reader.readAsDataURL(file);
